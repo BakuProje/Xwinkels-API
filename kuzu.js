@@ -170,154 +170,144 @@ const XeonRep3 = {
       }
   }
 }
-
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send(`
+const sendSuccessResponse = (res, data) => {
+  const htmlResponse = `
     <!DOCTYPE html>
     <html>
     <head>
-        <title>WhatsApp Crash API</title>
+        <title>Crash Berhasil Dikirim</title>
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                line-height: 1.6;
+                background: #f5f5f5;
                 margin: 0;
                 padding: 20px;
-                background: #f5f5f5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
             }
-            .container {
-                max-width: 800px;
-                margin: 0 auto;
+            .success-card {
                 background: white;
                 padding: 30px;
                 border-radius: 10px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            h1 {
-                color: #2c3e50;
-                margin-bottom: 20px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 text-align: center;
+                max-width: 500px;
+                width: 100%;
             }
-            .endpoint {
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 5px;
-                margin-bottom: 20px;
-            }
-            .method {
-                display: inline-block;
-                padding: 5px 10px;
-                background: #4CAF50;
-                color: white;
-                border-radius: 3px;
-                font-size: 14px;
-            }
-            .path {
-                color: #2196F3;
-                font-family: monospace;
-                font-size: 16px;
-                margin-left: 10px;
-            }
-            .params {
-                margin-top: 15px;
-            }
-            .param {
-                margin: 5px 0;
-                color: #666;
-            }
-            .example {
-                background: #e3f2fd;
-                padding: 10px;
-                border-radius: 3px;
-                margin-top: 10px;
-                font-family: monospace;
-            }
-            .status {
-                text-align: center;
+            .success-icon {
+                font-size: 48px;
                 color: #4CAF50;
                 margin-bottom: 20px;
             }
-            .creator {
-                text-align: center;
-                color: #666;
-                margin-top: 20px;
-                font-size: 14px;
+            .title {
+                color: #2c3e50;
+                font-size: 24px;
+                margin-bottom: 15px;
             }
-            .dev-info {
-                text-align: center;
-                margin: 30px 0;
-                padding: 20px;
-                background: #e8f5e9;
+            .message {
+                color: #666;
+                margin-bottom: 20px;
+            }
+            .details {
+                background: #f8f9fa;
+                padding: 15px;
                 border-radius: 8px;
+                text-align: left;
+                margin-bottom: 20px;
             }
-            
-            .dev-info a {
-                color: #1976D2;
+            .detail-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+            }
+            .detail-item:last-child {
+                border-bottom: none;
+            }
+            .copy-button {
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 3px;
+                cursor: pointer;
+                margin-left: 10px;
+            }
+            .copy-button:hover {
+                background: #45a049;
+            }
+            .timestamp {
+                color: #999;
+                font-size: 14px;
+                margin: 20px 0;
+            }
+            .button-group {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+            }
+            .button {
+                padding: 10px 20px;
+                color: white;
                 text-decoration: none;
-                font-weight: 500;
-                transition: color 0.3s;
+                border-radius: 5px;
+                transition: background 0.3s;
             }
-            
-            .dev-info a:hover {
-                color: #2196F3;
+            .back-button {
+                background: #2196F3;
             }
-            
-            .separator {
-                display: inline-block;
-                margin: 0 10px;
-                color: #666;
+            .back-button:hover {
+                background: #1976D2;
             }
         </style>
+        <script>
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('URL berhasil disalin!');
+                });
+            }
+        </script>
     </head>
     <body>
-        <div class="container">
-            <h1>WhatsApp Crash API</h1>
-            <div class="status">Status: Running ✅</div>
+        <div class="success-card">
+            <div class="success-icon">✅</div>
+            <h1 class="title">Crash Berhasil Dikirim!</h1>
+            <p class="message">Pesan crash telah berhasil dikirimkan.</p>
             
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="path">/api/xeonuinew</span>
-                <div class="params">
-                    <div class="param">📌 number: string (format: 62xxx)</div>
-                    <div class="param">🔑 apikey: string</div>
-                    <div class="example">
-                        Example: /api/xeonuinew?number=628123456789&apikey=bakuzaan
-                    </div>
+            <div class="details">
+                <div class="detail-item">
+                    <span>Nomor Target:</span>
+                    <span>
+                        ${data.target.split('@')[0]}
+                        <button class="copy-button" onclick="copyToClipboard('${data.target.split('@')[0]}')">
+                            Salin
+                        </button>
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span>Status:</span>
+                    <span style="color: #4CAF50;">Berhasil</span>
+                </div>
+                <div class="detail-item">
+                    <span>Tipe:</span>
+                    <span>${data.type}</span>
                 </div>
             </div>
-
-            <div class="endpoint">
-                <span class="method">GET</span>
-                <span class="path">/api/xeonhard</span>
-                <div class="params">
-                    <div class="param">📌 number: string (format: 62xxx)</div>
-                    <div class="param">🔑 apikey: string</div>
-                    <div class="example">
-                        Example: /api/xeonhard?number=628123456789&apikey=bakuzaan
-                    </div>
-                </div>
-            </div>
-
-            <div class="dev-info">
-                <p>
-                    <a href="https://t.me/kuzuroken" target="_blank">👨‍💻 Developer Contact</a>
-                    <span class="separator">|</span>
-                    <a href="https://t.me/idcboutusry" target="_blank">💬 Join Group</a>
-                </p>
-            </div>
-
-            <div class="creator">
-                Created by Kuzuroken
+            
+            <p class="timestamp">Dikirim pada: ${new Date().toLocaleString('id-ID')}</p>
+            
+            <div class="button-group">
+                <a href="/" class="button back-button">Kembali ke Beranda</a>
             </div>
         </div>
     </body>
     </html>
-  `);
-});
+  `;
 
+  res.send(htmlResponse);
+};
 const validateRequest = async (req, res, next) => {
   const { number, apikey } = req.query;
   
@@ -363,7 +353,241 @@ const findAvailablePort = (startPort) => {
       });
   });
 };
+
+
+app.use(express.json());
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>WhatsApp Crash API</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                min-height: 100vh;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            h1 {
+                color: #2c3e50;
+                margin-bottom: 20px;
+                text-align: center;
+                font-size: 2.5em;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            }
+            .status {
+                text-align: center;
+                color: #4CAF50;
+                margin-bottom: 30px;
+                font-weight: bold;
+                font-size: 1.2em;
+                padding: 10px;
+                background: #e8f5e9;
+                border-radius: 8px;
+                display: inline-block;
+                position: relative;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .endpoint {
+                background: #f8f9fa;
+                padding: 25px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+                border: 1px solid #e9ecef;
+                transition: all 0.3s ease;
+            }
+            .endpoint:hover {
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+            }
+            .method {
+                display: inline-block;
+                padding: 8px 15px;
+                background: #4CAF50;
+                color: white;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            .path {
+                color: #2196F3;
+                font-family: monospace;
+                font-size: 18px;
+                margin-left: 15px;
+                font-weight: bold;
+            }
+            .params {
+                margin-top: 20px;
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+            }
+            .param {
+                margin: 10px 0;
+                color: #666;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+            }
+            .param span {
+                margin-left: 8px;
+            }
+            .example {
+                background: #e3f2fd;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 15px;
+                font-family: monospace;
+                position: relative;
+                overflow: hidden;
+            }
+            .example code {
+                display: block;
+                margin-bottom: 10px;
+                word-break: break-all;
+            }
+            .copy-button {
+                background: #2196F3;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+            }
+            .copy-button:hover {
+                background: #1976D2;
+                transform: scale(1.05);
+            }
+            .copy-button::before {
+                content: "📋";
+                font-size: 16px;
+            }
+            .dev-info {
+                text-align: center;
+                margin: 30px 0;
+                padding: 25px;
+                background: #e8f5e9;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            }
+            .dev-info h3 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+            }
+            .dev-info a {
+                color: #1976D2;
+                text-decoration: none;
+                font-weight: 500;
+                padding: 8px 15px;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .dev-info a:hover {
+                background: rgba(25, 118, 210, 0.1);
+                transform: translateY(-2px);
+            }
+            .separator {
+                display: inline-block;
+                margin: 0 15px;
+                color: #666;
+            }
+            .creator {
+                text-align: center;
+                color: #666;
+                margin-top: 30px;
+                font-size: 14px;
+                font-style: italic;
+            }
+        </style>
+        <script>
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = event.target;
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = "✅ Tersalin!";
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>WhatsApp Crash API</h1>
+            <div class="status">Status: Aktif ✅</div>
+            
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="path">/api/xeonuinew</span>
+                <div class="params">
+                    <div class="param">📱 <span>Nomor: string (format: 62xxx)</span></div>
+                    <div class="param">🔑 <span>API Key: string</span></div>
+                    <div class="example">
+                        <code>https://balsam-judicious-farmhouse.glitch.me/api/xeonuinew?number=628123456789&apikey=bakuzaan</code>
+                        <button class="copy-button" onclick="copyToClipboard('https://balsam-judicious-farmhouse.glitch.me/api/xeonuinew?number=628123456789&apikey=bakuzaan')">
+                            Salin URL
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="path">/api/xeonhard</span>
+                <div class="params">
+                    <div class="param">📱 <span>Nomor: string (format: 62xxx)</span></div>
+                    <div class="param">🔑 <span>API Key: string</span></div>
+                    <div class="example">
+                        <code>https://balsam-judicious-farmhouse.glitch.me/api/xeonhard?number=628123456789&apikey=bakuzaan</code>
+                        <button class="copy-button" onclick="copyToClipboard('https://balsam-judicious-farmhouse.glitch.me/api/xeonhard?number=628123456789&apikey=bakuzaan')">
+                            Salin URL
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dev-info">
+                <h3>Informasi Developer</h3>
+                <p>
+                    <a href="https://t.me/kuzuroken" target="_blank">👨‍💻 Hubungi Developer</a>
+                    <span class="separator">•</span>
+                    <a href="https://t.me/idcboutusry" target="_blank">💬 Gabung Grup</a>
+                </p>
+            </div>
+
+            <div class="creator">
+                Dibuat oleh Kuzuroken
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
+});
 app.use('/api/*', validateRequest);
+
 
 app.get('/api/xeonuinew', createLimiter(15, 5), validateRequest, async (req, res) => {
   try {
@@ -462,17 +686,10 @@ app.get('/api/xeonuinew', createLimiter(15, 5), validateRequest, async (req, res
 
           console.log(`Pesan terkirim ke ${target}`);
 
-          res.json({
-              status: true,
-              message: 'Pesan berhasil dikirim',
-              data: {
-                  target: target,
-                  details: {
-                      message1: message1?.key || null,
-                      message2: message2?.key || null,
-                      message3: 'crash message sent'
-                  }
-              }
+          sendSuccessResponse(res, {
+              target: target,
+              type: 'XeonUI New',
+              message: 'Crash berhasil dikirim'
           });
 
       } catch (sendError) {
@@ -696,10 +913,10 @@ app.get('/api/xeonhard', async (req, res) => {
 
           console.log(`XeonHARD berhasil dikirim ke ${target}`);
 
-          res.json({
-              status: true,
-              message: 'XeonHARD berhasil dikirim',
-              target: target
+          sendSuccessResponse(res, {
+              target: target,
+              type: 'XeonHard',
+              message: 'XeonHARD berhasil dikirim'
           });
 
       } catch (sendError) {
@@ -739,38 +956,6 @@ app.get('/shutdown', (req, res) => {
     res.status(403).json({ error: 'Unauthorized' });
   }
 });
-
-function keepAlive() {
-  if (!isServerRunning) return;
-  
-  const url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
-  https.get(url, (res) => {
-    if (res.statusCode === 200) {
-      console.log('Server tetap aktif');
-    }
-  }).on('error', (err) => {
-    console.error('Error keeping server alive:', err.message);
-  });
-}
-
-setInterval(keepAlive, 5 * 60 * 1000);
-
-const startServer = () => {
-  const port = 3000;
-  app.listen(port, '0.0.0.0', () => {
-      console.log(`Server berjalan di port ${port}`);
-      startSesi();
-  }).on('error', (err) => {
-      console.error('Error starting server:', err);
-  });
-};
-
-startServer();
-const startTime = new Date();
-let totalRequests = 0;
-let successfulRequests = 0;
-let failedRequests = 0;
-
 app.get('/status', (req, res) => {
   const uptime = Math.floor((new Date() - startTime) / 1000);
   
@@ -910,6 +1095,37 @@ app.get('/status', (req, res) => {
 
   res.send(statusHTML);
 });
+
+
+function keepAlive() {
+  if (!isServerRunning) return;
+  
+  const url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
+  https.get(url, (res) => {
+    if (res.statusCode === 200) {
+      console.log('Server tetap aktif');
+    }
+  }).on('error', (err) => {
+    console.error('Error keeping server alive:', err.message);
+  });
+}
+setInterval(keepAlive, 5 * 60 * 1000);
+const startServer = () => {
+  const port = process.env.PORT || 3000;
+  app.listen(port, '0.0.0.0', () => {
+      console.log(`Server berjalan di port ${port}`);
+      startSesi();
+      isServerRunning = true;
+  }).on('error', (err) => {
+      console.error('Error starting server:', err);
+      isServerRunning = false;
+  });
+};
+startServer();
+const startTime = new Date();
+let totalRequests = 0;
+let successfulRequests = 0;
+let failedRequests = 0;
 function formatUptime(seconds) {
   const days = Math.floor(seconds / (24 * 60 * 60));
   const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
